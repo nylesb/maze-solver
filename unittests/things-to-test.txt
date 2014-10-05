@@ -1,0 +1,17 @@
+Input file reading
+    Should read a file called "testmaze.txt" and find its end of file
+    Should close connection to "testmaze.txt" after reading it
+    Should store (from "testmaze.txt") the maze as a list of lists
+    Should store (from "testmaze.txt") the starting input locations as a list
+
+Mouse navigator
+    Should move forward until it hits an obstacle
+    Should store its current path
+    Should verify that a valid starting location was chosen
+    Should report success upon finding an exit
+
+Specfic mazes
+
+Output
+    Should output data to a file called "breecher_hw1.out"
+    Should load program from file

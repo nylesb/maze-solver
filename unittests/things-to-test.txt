@@ -1,3 +1,5 @@
+++ Indicates item has been completed
+
 Input file reading
     Should read a file called "testmaze.txt" and find its end of file
     Should close connection to "testmaze.txt" after reading it
@@ -5,6 +7,8 @@ Input file reading
     Should store (from "testmaze.txt") the starting input locations as a list
 
 Mouse navigator
+    ++ Should have function to access position in maze.
+    Should confirm starting location is valid.
     Should move forward until it hits an obstacle
     Should store its current path
     Should verify that a valid starting location was chosen

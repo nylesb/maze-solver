@@ -34,6 +34,8 @@
 
 (terpri) ; Readability
 (terpri) ; Readability
+(setf success-message "Hooray! I am free.")
+(setf failure-message "Invalid location.")
 
 (run-test (lambda ()
   "Should have function to access position in maze."
@@ -45,10 +47,15 @@
     (assert-equal nil (pos maze 10 10)))))
 
 (run-test (lambda ()
-  "Should verify starting location is valid."
-  (let ((maze '((O + E))))
-    (assert-equal t (solve-maze maze 0 0))
-    (assert-equal "Invalid starting location." (solve-maze maze 0 1))
-    (assert-equal "Invalid starting location." (solve-maze maze 0 3)))))
+  "Should display success on exit or fail on invalid position."
+  (let ((maze '((E +))))
+    (assert-equal success-message (solve-maze maze 0 0))
+    (assert-equal failure-message (solve-maze maze 0 1))
+    (assert-equal failure-message (solve-maze maze 0 2)))))
+
+(run-test (lambda ()
+  "Should move forward until obstacle is hit."
+  (let ((maze '((O O O O O +))))
+    (assert-equal failure-message (solve-maze maze 0 0)))))
 
 (terpri) ; Readability

@@ -8,10 +8,15 @@
 
 (defun solve-maze (maze init-row init-col) ; maze a string
   (let ((row init-row)
-        (col init-col))
+        (col init-col)
+        (position-type (pos maze init-row init-col)))
     (defun navigate ()
-      ;; Verify valid starting location
-      (if (equal (pos maze row col) 'O)
-          (eval t)
-          (print "Invalid starting location.")))
+      (setf position-type (pos maze row col))
+      (cond ((or (equal position-type '+) (equal position-type nil))
+             (return-from navigate (print "Invalid location.")))
+            ((equal position-type 'E)
+             (return-from navigate (print "Hooray! I am free."))))
+      (setf col (+ col 1))
+      (print (cons row col))
+      (navigate))
     (navigate)))

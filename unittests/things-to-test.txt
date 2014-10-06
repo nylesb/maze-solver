@@ -9,9 +9,9 @@ Input file reading
 Mouse navigator
     ++ Should have function to access position in maze.
     ++ Should confirm starting location is valid.
-    Should move forward until it hits an obstacle
+    ++ Should move forward until it hits an obstacle
     Should store its current path
-    Should report success upon finding an exit
+    ++ Should report success upon finding an exit
 
 Specfic mazes
 

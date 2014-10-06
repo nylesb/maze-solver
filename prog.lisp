@@ -12,11 +12,11 @@
         (position-type (pos maze init-row init-col)))
     (defun navigate ()
       (setf position-type (pos maze row col))
+      ;; Stop navigating upon finding an exit or hitting an obstacle
       (cond ((or (equal position-type '+) (equal position-type nil))
              (return-from navigate (print "Invalid location.")))
             ((equal position-type 'E)
-             (return-from navigate (print "Hooray! I am free."))))
-      (setf col (+ col 1))
-      (print (cons row col))
-      (navigate))
+             (return-from solve-maze (print "Hooray! I am free."))))
+      (setf col (+ col 1)) (navigate) (setf col (- col 1)) ; Right
+      (setf row (+ row 1)) (navigate) (setf row (- row 1))) ; Down
     (navigate)))

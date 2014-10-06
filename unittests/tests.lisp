@@ -58,4 +58,10 @@
   (let ((maze '((O O O O O +))))
     (assert-equal failure-message (solve-maze maze 0 0)))))
 
+(run-test (lambda ()
+  "Should run right into obstacle, then move down once to find exit."
+  (let ((maze '((O O +)
+                (+ E O))))
+    (assert-equal success-message (solve-maze maze 0 0)))))
+
 (terpri) ; Readability

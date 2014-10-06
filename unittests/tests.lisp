@@ -9,9 +9,17 @@
                 (princ "Try running from project directory.")
                 (quit))))
 
+;;; Suppresses any terminal printing function might do.
+(defun funcall-suppressed (function)
+  (with-output-to-string (*standard-output*
+                           (make-array '(0)
+                                       :element-type 'base-char
+                                       :fill-pointer 0 :adjustable t))
+    (funcall function)))
+
 ;;; Catches errors testcase might throw, then prints fail/pass to output.
 (defun run-test (testcase) ; testcase is a function
-  (if (ignore-errors (funcall testcase))
+  (if (ignore-errors (funcall-suppressed testcase))
       (princ (format nil "   O Pass: ~A ~%" (documentation testcase 'function)))
       (princ (format nil " X   Fail: ~A ~%" (documentation testcase 'function)))))
 
@@ -39,8 +47,8 @@
 (run-test (lambda ()
   "Should verify starting location is valid."
   (let ((maze '((O + E))))
-    (assert-equal t (navigate maze 0 0))
-    (assert-equal "Invalid starting location." (navigate maze 0 1))
-    (assert-equal "Invalid starting location." (navigate maze 0 2)))))
+    (assert-equal t (solve-maze maze 0 0))
+    (assert-equal "Invalid starting location." (solve-maze maze 0 1))
+    (assert-equal "Invalid starting location." (solve-maze maze 0 3)))))
 
 (terpri) ; Readability

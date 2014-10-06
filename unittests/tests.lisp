@@ -5,7 +5,9 @@
 
 (cond ((ignore-errors (load "prog.lisp")) nil) ; Run from maze-solver dir
       ((ignore-errors (load "../prog.lisp")) nil) ; Run from unittests dir
-      (t (print "Failure to load program file.")))
+      (t (progn (princ "Failure to load program file.")
+                (princ "Try running from project directory.")
+                (quit))))
 
 ;;; Catches errors testcase might throw, then prints fail/pass to output.
 (defun run-test (testcase) ; testcase is a function
@@ -23,6 +25,7 @@
 ;;; Test cases
 
 (terpri) ; Readability
+(terpri) ; Readability
 
 (run-test (lambda ()
   "Should have function to access position in maze."
@@ -32,5 +35,12 @@
     (assert-equal "cat" (pos maze 1 2))
     (assert-equal 'O (pos maze 0 1))
     (assert-equal nil (pos maze 10 10)))))
+
+(run-test (lambda ()
+  "Should verify starting location is valid."
+  (let ((maze '((O + E))))
+    (assert-equal t (navigate maze 0 0))
+    (assert-equal "Invalid starting location." (navigate maze 0 1))
+    (assert-equal "Invalid starting location." (navigate maze 0 2)))))
 
 (terpri) ; Readability

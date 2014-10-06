@@ -1,11 +1,13 @@
 ;;; Helper functions
 
 ;;; Returns the value at position (x,y) in maze
-(defun pos (maze x y) ; maze a list
-  (nth y (nth x maze)))
+(defun pos (maze i j) ; maze a list
+  (nth j (nth i maze)))
 
-(defun navigate (maze startx starty) ; maze a list
-  (pos maze startx starty))
+(defun navigate (maze starti startj) ; maze a list
+  (if (equal (pos maze starti startj) 'O)
+      (eval t)
+      (print "Invalid starting location.")))
 
 ;;; Main function
 

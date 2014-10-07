@@ -1,9 +1,12 @@
 ;;; Solves an appropriately formatted maze and returns results.
 
-(defun solve-maze (init-maze init-row init-col) ; maze a string
-  (let ((maze (copy-tree init-maze))
-        (row init-row)
-        (col init-col)
+(defun solve-maze (&key file maze-list)
+  "solve-maze can be run two ways by the appropriate key arguments:
+      :file gives input as a filename of a properly formatted maze file
+      :maze-list gives input as a list of the form (maze-list init-row init-col)"
+  (let* ((maze (copy-tree (first maze-list)))
+        (row (second maze-list))
+        (col (third maze-list))
         (pos-type nil)
         (path '(START))) ; path stores movements in reverse order
     (labels ((pos (i j)
@@ -31,5 +34,6 @@
                (setf row (- row 1) path (append '(U) path)) ; Up
                (navigate)
                (setf row (+ row 1) path (cdr path)) ; Backtrack
+               (setf (nth col (nth row maze)) 'O) ; Unmark
                (return-from navigate (list path "Help! I am trapped.")))) ; Paths exhausted
-    (navigate))))
+      (navigate))))

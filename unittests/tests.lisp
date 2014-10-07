@@ -43,23 +43,23 @@
 (run-test (lambda ()
   "Should display success on exit or invalid on + or out of maze."
   (let ((maze '((E +))))
-    (assert-equal success-message (second (solve-maze maze 0 0)))
-    (assert-equal invalid-message (second (solve-maze maze 0 1)))
-    (assert-equal invalid-message (second (solve-maze maze 0 2))))))
+    (assert-equal success-message (second (solve-maze :maze-list (list maze 0 0))))
+    (assert-equal invalid-message (second (solve-maze :maze-list (list maze 0 1))))
+    (assert-equal invalid-message (second (solve-maze :maze-list (list maze 0 2)))))))
 
 (run-test (lambda ()
   "Should move forward until obstacle is hit."
   (let ((maze '((O O O O O +))))
-    (assert-equal failure-message (second (solve-maze maze 0 0))))))
+    (assert-equal failure-message (second (solve-maze :maze-list (list maze 0 0)))))))
 
 (run-test (lambda ()
   "Should run right into wall, move down one row, move right to exit."
   (let ((maze '((O O +)
                 (+ E O))))
-    (assert-equal success-message (second (solve-maze maze 0 0)))
+    (assert-equal success-message (second (solve-maze :maze-list (list maze 0 0))))
     (setf maze '((O O + +)
                  (+ O O E)))
-    (assert-equal success-message (second (solve-maze maze 0 0))))))
+    (assert-equal success-message (second (solve-maze :maze-list (list maze 0 0)))))))
 
 (run-test (lambda ()
   "Should store current path and return it as result on success."
@@ -67,7 +67,7 @@
                 (+ O O O +)
                 (+ O O E +)))
         (expected '(START R D R R D)))
-    (assert-equal expected (first (solve-maze maze 0 0))))))
+    (assert-equal expected (first (solve-maze :maze-list (list maze 0 0)))))))
 
 (run-test (lambda ()
   "Should mark path on maze and not cross it."
@@ -77,9 +77,9 @@
         (expected '((X X + + +)
                     (+ X X X +)
                     (+ O O E +))))
-    (assert-equal expected (third (solve-maze maze 0 0)))
+    (assert-equal expected (third (solve-maze :maze-list (list maze 0 0))))
     (setf maze '((O O O +)))
-    (assert-equal failure-message (second (solve-maze maze 0 0))))))
+    (assert-equal failure-message (second (solve-maze :maze-list (list maze 0 0)))))))
 
 (run-test (lambda ()
   "Should navigate a sprial successfully."
@@ -91,8 +91,18 @@
                 (+ O + + + O +)
                 (+ O O O O O +)
                 (+ + + + + + +))))
-    (assert-equal success-message (second (solve-maze maze 0 0)))
+    (assert-equal success-message (second (solve-maze :maze-list (list maze 0 0))))
     (setf (nth 3 (nth 4 maze)) 'O) ; No exit now
-    (assert-equal failure-message (second (solve-maze maze 0 0))))))
+    (assert-equal failure-message (second (solve-maze :maze-list (list maze 0 0)))))))
+
+(run-test (lambda ()
+  "Should navigate a maze with simple backtracking."
+  (let ((maze '((+ + + + + + +)
+                (+ E O O O O +)
+                (+ + + + + + +)))
+        (expected '(START L L)))
+    (assert-equal expected (first (solve-maze :maze-list (list maze 1 3))))
+    (setf (nth 1 (nth 1 maze)) 'O) ; No exit now
+    (assert-equal failure-message (second (solve-maze :maze-list (list maze 1 3)))))))
 
 (terpri) ; Readability

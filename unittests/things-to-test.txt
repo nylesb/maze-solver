@@ -19,7 +19,21 @@ Mouse navigator
 
 Specfic mazes
     ++ Spiral
-
+(run-test (lambda ()
+  "Should navigate a maze which requires backtracking."
+  (let ((maze '((+ O O O O O +)
+                (+ O + + + O O)
+                (O O O O O + O)
+                (O + O O O + O)
+                (O + + + + + O)
+                (O O O + O + O)
+                (O + O O O + O)
+                (E + + + + + +)))
+        (expected '(START U L L L L D D L D D D D D)))
+    (assert-equal expected (second (solve-maze :maze-list (list maze 5 1))))
+    (setf (nth 5 (nth 2 maze)) 'O) ; No exit now
+    (assert-equal failure-message (second (solve-maze :maze-list (list maze 5 1)))))))
+    
 Output
     Should output data to a file called "breecher_hw1.out"
     Should load program from file

@@ -81,4 +81,16 @@
     (setf maze '((O O O +)))
     (assert-equal failure-message (second (solve-maze maze 0 0))))))
 
+(run-test (lambda ()
+  "Should navigate a sprial successfully."
+  (let ((maze '((O O O O O O +)
+                (+ + + + + O +)
+                (+ O O O + O +)
+                (+ O + O + O +)
+                (+ O + E + O +)
+                (+ O + + + O +)
+                (+ O O O O O +)
+                (+ + + + + + +))))
+    (assert-equal success-message (second (solve-maze maze 0 0))))))
+
 (terpri) ; Readability

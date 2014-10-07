@@ -1,3 +1,5 @@
+A document to help organze my work for the project by itemizing the things
+which need to be completed.
 ++ Indicates item has been completed
 
 Input file reading
@@ -16,18 +18,7 @@ Mouse navigator
     ++ Should move right until object hit, move down, the move forward to exit
 
 Specfic mazes
-
-(run-test (lambda ()
-  "Should navigate a sprial successfully."
-  (let ((maze '((O O O O O O +)
-                (+ + + + + O +)
-                (+ O O O + O +)
-                (+ O + O + O +)
-                (+ O + E + O +)
-                (+ O + + + O +)
-                (+ O O O O O +)
-                (+ + + + + + +))))
-    (assert-equal success-message (solve-maze maze 0 0)))))
+    ++ Spiral
 
 Output
     Should output data to a file called "breecher_hw1.out"

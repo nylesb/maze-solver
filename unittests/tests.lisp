@@ -9,33 +9,36 @@
                 (princ "Try running from project directory.")
                 (quit))))
 
-;;; Suppresses any terminal printing function might do.
+;;; Suppresses any standard output printing function might do.
 (defun funcall-suppressed (function)
-  (with-output-to-string (*standard-output*
-                           (make-array '(0)
-                                       :element-type 'base-char
-                                       :fill-pointer 0 :adjustable t))
+  (with-open-stream (*standard-output* (make-broadcast-stream))
     (funcall function)))
 
-;;; Catches errors testcase might throw, then prints fail/pass to output.
+;;; Catches errors testcase might throw, then prints test results to output.
 (defun run-test (testcase) ; testcase is a function
-  (if (ignore-errors (funcall-suppressed testcase))
-      (princ (format nil "   O Pass: ~A ~%" (documentation testcase 'function)))
-      (princ (format nil " X   Fail: ~A ~%" (documentation testcase 'function)))))
+  (let ((error-capture (make-string-output-stream)))
+    (if (with-open-stream (*error-output* (make-broadcast-stream error-capture))
+          (ignore-errors (funcall-suppressed testcase)))
+        (princ (format nil "  O Pass: ~A ~%" (documentation testcase 'function)))
+        (princ (format nil " X  Fail: ~A ~%" (documentation testcase 'function))))
+    (princ (get-output-stream-string error-capture))))
 
 ;;; Throws an error if unequal, allowing run-test to catch test failures.
-;;; Also prints to display an error message.
+;;; Also sends an error message to show expected vs actual result.
 (defun assert-equal (expected actual)
   (if (equal expected actual)
       (eval t)
-      (error (princ (format nil "Wanted ~A, got ~A." expected actual)))))
+      (progn (format *error-output* "      Expected: ~A~%" expected)
+             (format *error-output* "      Actual  : ~A.~%" actual)
+             (error ""))))
   
 ;;; Test cases
 
 (terpri) ; Readability
 (terpri) ; Readability
 (setf success-message "Hooray! I am free.")
-(setf failure-message "Invalid location.")
+(setf invalid-message "Invalid location.")
+(setf failure-message "Help! I am trapped.")
 
 (run-test (lambda ()
   "Should have function to access position in maze."
@@ -47,11 +50,11 @@
     (assert-equal nil (pos maze 10 10)))))
 
 (run-test (lambda ()
-  "Should display success on exit or fail on invalid position."
+  "Should display success on exit or invalid on + or out of maze."
   (let ((maze '((E +))))
-    (assert-equal success-message (solve-maze maze 0 0))
-    (assert-equal failure-message (solve-maze maze 0 1))
-    (assert-equal failure-message (solve-maze maze 0 2)))))
+    (assert-equal success-message (second (solve-maze maze 0 0)))
+    (assert-equal invalid-message (second (solve-maze maze 0 1)))
+    (assert-equal invalid-message (second (solve-maze maze 0 2))))))
 
 (run-test (lambda ()
   "Should move forward until obstacle is hit."
@@ -59,9 +62,20 @@
     (assert-equal failure-message (solve-maze maze 0 0)))))
 
 (run-test (lambda ()
-  "Should run right into obstacle, then move down once to find exit."
+  "Should run right into wall, move down one row, move right to exit."
   (let ((maze '((O O +)
                 (+ E O))))
-    (assert-equal success-message (solve-maze maze 0 0)))))
+    (assert-equal success-message (second (solve-maze maze 0 0)))
+    (setf maze '((O O + +)
+                 (+ O O E)))
+    (assert-equal success-message (second (solve-maze maze 0 0))))))
+
+(run-test (lambda ()
+  "Should store current path and return it as result on success."
+  (let ((maze '((O O + + +)
+                (+ O O O +)
+                (+ O O E +)))
+        (expected '(START R D R R D)))
+    (assert-equal expected (first (solve-maze maze 0 0))))))
 
 (terpri) ; Readability

@@ -41,15 +41,6 @@
 (setf failure-message "Help! I am trapped.")
 
 (run-test (lambda ()
-  "Should have function to access position in maze."
-  (let ((maze '((t O O)
-                (+ + "cat"))))
-    (assert-equal t (pos maze 0 0))
-    (assert-equal "cat" (pos maze 1 2))
-    (assert-equal 'O (pos maze 0 1))
-    (assert-equal nil (pos maze 10 10)))))
-
-(run-test (lambda ()
   "Should display success on exit or invalid on + or out of maze."
   (let ((maze '((E +))))
     (assert-equal success-message (second (solve-maze maze 0 0)))
@@ -59,7 +50,7 @@
 (run-test (lambda ()
   "Should move forward until obstacle is hit."
   (let ((maze '((O O O O O +))))
-    (assert-equal failure-message (solve-maze maze 0 0)))))
+    (assert-equal failure-message (second (solve-maze maze 0 0))))))
 
 (run-test (lambda ()
   "Should run right into wall, move down one row, move right to exit."
@@ -77,5 +68,17 @@
                 (+ O O E +)))
         (expected '(START R D R R D)))
     (assert-equal expected (first (solve-maze maze 0 0))))))
+
+(run-test (lambda ()
+  "Should mark path on maze and not cross it."
+  (let ((maze     '((O O + + +)
+                    (+ O O O +)
+                    (+ O O E +)))
+        (expected '((X X + + +)
+                    (+ X X X +)
+                    (+ O O E +))))
+    (assert-equal expected (third (solve-maze maze 0 0)))
+    (setf maze '((O O O +)))
+    (assert-equal failure-message (second (solve-maze maze 0 0))))))
 
 (terpri) ; Readability

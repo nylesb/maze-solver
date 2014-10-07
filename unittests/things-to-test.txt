@@ -9,31 +9,20 @@ Input file reading
     Should store (from "testmaze.txt") the starting input locations as a list
 
 Mouse navigator
-    ++ Should have function to access position in maze.
-    ++ Should confirm starting location is valid.
+    ++ Should have function to access position in maze
+    ++ Should confirm starting location is valid
     ++ Should move forward until it hits an obstacle
     ++ Should store its current path and not cross (i.e. stops looping)
     ++ Should report success upon finding an exit
     ++ Should move right until object hit, then move down to exit
     ++ Should move right until object hit, move down, the move forward to exit
+    ++ Should count number of positions tried before exit and return
+    Should return maze with navigation path marked on it
 
 Specfic mazes
     ++ Spiral
-(run-test (lambda ()
-  "Should navigate a maze which requires backtracking."
-  (let ((maze '((+ O O O O O +)
-                (+ O + + + O O)
-                (O O O O O + O)
-                (O + O O O + O)
-                (O + + + + + O)
-                (O O O + O + O)
-                (O + O O O + O)
-                (E + + + + + +)))
-        (expected '(START U L L L L D D L D D D D D)))
-    (assert-equal expected (second (solve-maze :maze-list (list maze 5 1))))
-    (setf (nth 5 (nth 2 maze)) 'O) ; No exit now
-    (assert-equal failure-message (second (solve-maze :maze-list (list maze 5 1)))))))
-    
+    ++ Simple backtracking
+    ++ Complicated backtracking
+
 Output
     Should output data to a file called "breecher_hw1.out"
-    Should load program from file

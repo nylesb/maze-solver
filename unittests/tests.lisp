@@ -91,6 +91,8 @@
                 (+ O + + + O +)
                 (+ O O O O O +)
                 (+ + + + + + +))))
-    (assert-equal success-message (second (solve-maze maze 0 0))))))
+    (assert-equal success-message (second (solve-maze maze 0 0)))
+    (setf (nth 3 (nth 4 maze)) 'O) ; No exit now
+    (assert-equal failure-message (second (solve-maze maze 0 0))))))
 
 (terpri) ; Readability

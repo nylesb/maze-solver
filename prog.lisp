@@ -1,7 +1,8 @@
 ;;; Solves an appropriately formatted maze and returns results.
 
-(defun solve-maze (maze init-row init-col) ; maze a string
-  (let ((row init-row)
+(defun solve-maze (init-maze init-row init-col) ; maze a string
+  (let ((maze (copy-tree init-maze))
+        (row init-row)
         (col init-col)
         (pos-type nil)
         (path '(START))) ; path stores movements in reverse order

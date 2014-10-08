@@ -9,23 +9,30 @@
         (col (third maze-list))
         (pos-type nil)
         (moves 0)
+        (message nil)
         (path '(START))) ; path stores movements in reverse order
-    (labels ((pos (i j)
-               (if (and (> i -1) (> j -1))
-                   (nth j (nth i maze))
-                   nil))
-             (results (message)
-               (list (reverse path) (print message) maze moves))
+    (labels ((pos (i j &key modify)
+               "Safely access maze value at position i j in maze.
+               If :modify is passed, sets position to that value first."
+               (if (and (> i -1) (< i (length maze)) (> j -1) (< j (length (nth i maze))))
+                   (progn (if (not (equal modify nil))
+                              (setf (nth j (nth i maze)) modify))
+                          (nth j (nth i maze)))))
+             (results ()
+               (pos (second maze-list) (third maze-list) :modify '*) ; Mark start
+               (list (print (reverse path)) (print message) (print maze) (print moves)))
              (navigate ()
+               "Recursively travels maze and keeps track of path to not doubleback."
+               ;; Stop navigating upon finding an exit, obstacle, or previous path.
                (setf pos-type (pos row col))
-               ;; Stop navigating upon finding an exit or hitting an obstacle
                (cond ((or (equal pos-type '+) (equal pos-type nil) (equal pos-type 'X))
-                      (progn (setf moves (- moves 2))
-                             (return-from navigate (results "Invalid location."))))
+                      (progn (setf moves (- moves 2)) ; Fixes false movement
+                             (return-from navigate)))
                      ((equal pos-type 'E)
-                      (return-from solve-maze (results "Hooray! I am free."))))
+                      (setf message "Hooray! I am free.")
+                      (return-from solve-maze (results))))
                ;; Try every direction from current location
-               (setf (nth col (nth row maze)) 'X) ; Mark current location
+               (pos row col :modify 'X) ; Mark current location
                (setf col (+ col 1) path (append '(R) path) moves (+ moves 1)) ; Right
                (navigate)
                (setf col (- col 1) path (cdr path) moves (+ moves 1)) ; Backtrack
@@ -38,7 +45,9 @@
                (setf row (- row 1) path (append '(U) path) moves (+ moves 1)) ; Up
                (navigate)
                (setf row (+ row 1) path (cdr path) moves (+ moves 1)) ; Backtrack
-               (setf (nth col (nth row maze)) 'O) ; Unmark
-               (return-from navigate (results "Help! I am trapped.")))) ; Paths exhausted
-      (navigate))))
-      ;(list (reverse path) (print message) maze moves))))
+               (pos row col :modify 'O) ; Unmark
+               (setf message "Help! I am trapped.")
+               (return-from navigate))) ; Paths exhausted
+      (navigate)
+      (setf message "Help! I am trapped.")
+      (results))))

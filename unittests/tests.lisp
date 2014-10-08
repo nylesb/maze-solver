@@ -6,8 +6,7 @@
 (cond ((ignore-errors (load "prog.lisp")) nil) ; Run from maze-solver dir
       ((ignore-errors (load "../prog.lisp")) nil) ; Run from unittests dir
       (t (progn (princ "Failure to load program file.")
-                (princ "Try running from project directory.")
-                (quit))))
+                (princ "Try running from project directory."))))
 
 ;;; Suppresses any standard output printing function might do.
 (defun funcall-suppressed (function)
@@ -37,15 +36,14 @@
 (terpri) ; Readability
 (terpri) ; Readability
 (setf success-message "Hooray! I am free.")
-(setf invalid-message "Invalid location.")
 (setf failure-message "Help! I am trapped.")
 
 (run-test (lambda ()
-  "Should display success on exit or invalid on + or out of maze."
+  "Should check for valid starting positions & display success on exit."
   (let ((maze '((E +))))
     (assert-equal success-message (second (solve-maze :maze-list (list maze 0 0))))
-    (assert-equal invalid-message (second (solve-maze :maze-list (list maze 0 1))))
-    (assert-equal invalid-message (second (solve-maze :maze-list (list maze 0 2)))))))
+    (assert-equal failure-message (second (solve-maze :maze-list (list maze 0 1))))
+    (assert-equal failure-message (second (solve-maze :maze-list (list maze 0 2)))))))
 
 (run-test (lambda ()
   "Should move forward until obstacle is hit."
@@ -74,7 +72,7 @@
   (let ((maze     '((O O + + +)
                     (+ O O O +)
                     (+ E O O +)))
-        (expected '((X X + + +)
+        (expected '((* X + + +)
                     (+ X X X +)
                     (+ E X X +))))
     (assert-equal expected (third (solve-maze :maze-list (list maze 0 0))))
@@ -122,12 +120,25 @@
 
 (run-test (lambda ()
   "Should return number of moves made (including backtracking)."
-  (let ((maze '((+ + + + + + +)
-                (+ E O O O O +)
-                (+ + + + O + +)))
-        (expected 9))
-    (assert-equal expected (fourth (solve-maze :maze-list (list maze 1 2))))
-    (setf (nth 1 (nth 1 maze)) 'O expected (+ expected 1)) ; No exit now
-    (assert-equal expected (fourth (solve-maze :maze-list (list maze 1 2)))))))
+  (let ((maze '((+ O O O O O +)
+                (+ O + + + O O)
+                (O O O O + + O)
+                (O + O O O + O)
+                (O + + + + + O)
+                (O O O + O + O)
+                (O + O O O + O)
+                (E + + + + + +)))
+        (expected 55))
+    (assert-equal expected (fourth (solve-maze :maze-list (list maze 1 5)))))))
+
+(run-test (lambda ()
+  "Should navigate ill-formed mazes."
+  (let ((maze '((O O O)
+                (+ O + O O +)
+                (O O O)
+                (O +)
+                (O O O E)))
+        (expected success-message))
+    (assert-equal expected (second (solve-maze :maze-list (list maze 0 0)))))))
 
 (terpri) ; Readability

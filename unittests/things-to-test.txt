@@ -23,6 +23,7 @@ Specfic mazes
     ++ Spiral
     ++ Simple backtracking
     ++ Complicated backtracking
+    ++ Ill-formed mazes
 
 Output
     Should output data to a file called "breecher_hw1.out"

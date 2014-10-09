@@ -2,9 +2,8 @@
 ;;; This file runs all tests and displays results
 
 ;;; Preparation
-
-(cond ((ignore-errors (load "prog.lisp")) nil) ; Run from maze-solver dir
-      ((ignore-errors (load "../prog.lisp")) nil) ; Run from unittests dir
+(cond ((ignore-errors (load "prog.lisp")) (setf cwd "unittests/")) ; Run from maze-solver dir
+      ((ignore-errors (load "../prog.lisp")) (setf cwd "")) ; Run from unittests dir
       (t (progn (princ "Failure to load program file.")
                 (princ "Try running from project directory."))))
 
@@ -140,5 +139,19 @@
                 (O O O E)))
         (expected success-message))
     (assert-equal expected (second (solve-maze :maze-list (list maze 0 0)))))))
+
+;; Note: maze-for-unittests.txt file creased for following tests:
+
+(run-test (lambda ()
+  "Should solve a maze with one starting location from input file."
+  (let ((expected success-message)
+        (filename (format nil "~Amaze-for-unittests.txt" cwd)))
+    (assert-equal expected (second (solve-maze :file filename))))))
+
+(run-test (lambda ()
+  "Should solve a maze from file that has multiple starting locations !!TEST NOT WRITEN!!."
+  (let ((expected success-message)
+        (filename (format nil "~Amaze-for-unittests.txt" cwd)))
+    (assert-equal nil (second (solve-maze :file filename))))))
 
 (terpri) ; Readability

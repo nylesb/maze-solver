@@ -69,5 +69,5 @@
 
 (defun create-problem (size)
   "Randomly generates a maze & set of starting coordinates, then runs solve-maze on them."
-  (let ((maze '()))
-    (body)))
+  (let ((maze (make-list size :initial-element (make-list size :initial-element 'O))))
+    maze))

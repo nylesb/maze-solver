@@ -36,14 +36,22 @@
 ;;; Run solve-maze on input and return value of interest
 ;;; Separates tests from needing to know specific output order
 (defun results (input &key message maze path moves)
-  (let ((output (if (typep input 'string)
-                    (solve-maze :file input)
-                    (solve-maze :maze-list input))))
-    (cond (message (second output))
-          (maze (third output))
-          (path (first output))
-          (moves (fourth output))
-          (t output))))
+  (let ((reder nil)
+        (output (make-array '(0) :element-type 'base-char
+                             :fill-pointer 0 :adjustable t)))
+    (with-output-to-string (*standard-output* output)
+      (if (typep input 'string)
+          (solve-maze :file input)
+          (solve-maze :maze-list input))
+      (with-input-from-string (in output)
+        (setf reader (read in))
+        (when path (return-from results reader))
+        (setf reader (read in))
+        (when message (return-from results reader))
+        (setf reader (read in))
+        (when maze (return-from results reader))
+        (setf reader (read in))
+        (when moves (return-from results reader))))))
 
 ;;; Test cases
 ;;; Tests formatting by passing the test function into run-test.

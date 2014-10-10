@@ -33,30 +33,32 @@
              (format *error-output* "      Actual  : ~A.~%" actual)
              (error ""))))
 
-;;; Run solve-maze on input and return value of interest
-;;; Separates tests from needing to know specific output order
-(defun results (input &key message maze path moves)
-  (let ((reder nil)
+;;; Run solve-maze on input and return the printed value of interest
+;;; Separates tests from having to collect printed data or know output order.
+(defun results (input &key message maze path moves raw)
+  (let ((raw-output nil)
         (output (make-array '(0) :element-type 'base-char
                              :fill-pointer 0 :adjustable t)))
+    ;; Collect solve-maze's printed output and store into raw-output
     (with-output-to-string (*standard-output* output)
       (if (typep input 'string)
           (solve-maze :file input)
           (solve-maze :maze-list input))
       (with-input-from-string (in output)
-        (setf reader (read in))
-        (when path (return-from results reader))
-        (setf reader (read in))
-        (when message (return-from results reader))
-        (setf reader (read in))
-        (when maze (return-from results reader))
-        (setf reader (read in))
-        (when moves (return-from results reader))))))
+        (loop (if (listen in)
+                  (setf raw-output  (append raw-output  (list (read in))))
+                  (return)))))
+    ;; Return specific result based on what user asked for
+    (cond (path (return-from results (first raw-output)))
+          (message (return-from results (second raw-output)))
+          (maze (return-from results (third raw-output)))
+          (moves (return-from results (fourth raw-output)))
+          (raw (return-from results raw-output)))))
 
 ;;; Test cases
-;;; Tests formatting by passing the test function into run-test.
+;;; Tests formatted by passing the test function into run-test.
 ;;; The test's doc string will display as the test description.
-;;; 
+;;; Use assert-equal to signal test success or failure.
 
 (setf success-message "Hooray! I am free.")
 (setf failure-message "Help! I am trapped.")
@@ -178,16 +180,10 @@
 (run-test (lambda ()
   "Should solve a maze from file that has multiple starting locations."
   (let* ((filename (format nil "~Amaze-for-unittests.txt" testdir))
-         (output-capture (with-output-to-string (*standard-output*)
-                  (results filename)))
-         (actual nil))
-    (with-input-from-string (in output-capture)
-      (read in) ; discards first path
-      (assert-equal success-message (read in nil)) ; first run success
-      (progn (read in nil) (read in nil) (read in nil)) ; move to next run
-      (assert-equal success-message (read in nil)) ; second run also sucess
-      (progn (read in nil) (read in nil) (read in nil)) ; move to third run
-      (assert-equal failure-message (read in nil)))))) ; third run is failure
+         (actual (results filename :raw t)))
+    (assert-equal success-message (nth 1 actual)) ; first run success
+    (assert-equal success-message (nth 5 actual)) ; second run also sucess
+    (assert-equal failure-message (nth 9 actual))))) ; third run is failure
 
 (run-test (lambda ()
   "Should generate a variable size maze of all O's."

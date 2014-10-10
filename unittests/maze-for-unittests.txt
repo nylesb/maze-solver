@@ -1,11 +1,12 @@
 ((+ O O O O O +)
-(+ O + + + O O)
-(O O O O + + O)
-(O + O O O + O)
-(O + + + + + O)
-(O O O + O + O)
-(O + O O O + O)
-(E + + + + + +))
+ (+ O + + + O O)
+ (O O O O + + O)
+ (O + O O O + O)
+ (O + + + + + O)
+ (O O O + O + O)
+ (O + O O O + O)
+ (E + + + + + +))
+1 5
 1 5
 3 3
 4 1

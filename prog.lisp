@@ -38,7 +38,10 @@
                  (results ()
                    "Formats and prints output after maze navigation is complete"
                    (pos (first start) (second start) :modify '*) ; Mark start
-                   (list (print (reverse path)) (print message) (print maze) (print moves)))
+                   (progn (princ (format nil "(~A ~%" (first maze)))
+                          (princ (format nil "~{ ~A ~%~}" (rest (reverse (rest (reverse maze))))))
+                          (princ (format nil " ~A)" (nth (- (length maze) 1) maze)))
+                          (print message) (print moves) (print (reverse path))))
                  (navigate ()
                    "Recursively travels maze using let* block's vars to store intermediate results."
                    ;; Stop navigating upon finding an exit, obstacle, or previous path.
@@ -67,7 +70,7 @@
           (navigate)
           (results))))))
 
-(defun create-problem (size)
+(defun create-problem (&optional size)
   "Randomly generates a maze & set of starting coordinates, then runs solve-maze on them."
   (let ((maze (make-list size :initial-element (make-list size :initial-element 'O))))
     maze))

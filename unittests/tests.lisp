@@ -46,13 +46,13 @@
           (solve-maze :maze-list input))
       (with-input-from-string (in output)
         (loop (if (listen in)
-                  (setf raw-output  (append raw-output  (list (read in))))
+                  (setf raw-output  (append raw-output  (list (read in nil))))
                   (return)))))
     ;; Return specific result based on what user asked for
-    (cond (path (return-from results (first raw-output)))
+    (cond (path (return-from results (fourth raw-output)))
           (message (return-from results (second raw-output)))
-          (maze (return-from results (third raw-output)))
-          (moves (return-from results (fourth raw-output)))
+          (maze (return-from results (first raw-output)))
+          (moves (return-from results (third raw-output)))
           (raw (return-from results raw-output)))))
 
 ;;; Test cases

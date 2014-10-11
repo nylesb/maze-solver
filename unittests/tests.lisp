@@ -62,16 +62,18 @@
 
 (setf success-message "Hooray! I am free.")
 (setf failure-message "Help! I am trapped.")
-(terpri)
-(terpri)
+(setf invalid-message "Invalid starting position.")
 
+;; Delimter for test set
+(princ (format nil "~%~%->Tests for functionality of solve-maze~%~%"))
 
 (run-test (lambda ()
   "Should check for valid starting positions & display success on exit."
-  (let ((maze '((E +))))
+  (let ((maze '((E O +))))
     (assert-equal success-message (results (list maze 0 0) :message t))
-    (assert-equal failure-message (results (list maze 0 1) :message t))
-    (assert-equal failure-message (results (list maze 0 2) :message t)))))
+    (assert-equal success-message (results (list maze 0 1) :message t))
+    (assert-equal invalid-message (results (list maze 0 2) :message t))
+    (assert-equal invalid-message (results (list maze 0 3) :message t)))))
 
 (run-test (lambda ()
   "Should move forward until obstacle is hit."
@@ -169,7 +171,9 @@
         (expected success-message))
     (assert-equal expected (results (list maze 0 0) :message t)))))
 
-;; Note: maze-for-unittests.txt file creased for following tests:
+;; Delimter for test set
+;; This set uses maze-for-unittests.txt to check file i/o
+(princ (format nil "~%->Tests for reading from input file~%~%"))
 
 (run-test (lambda ()
   "Should solve a maze with one starting location from input file."
@@ -183,19 +187,22 @@
          (actual (results filename :raw t)))
     (assert-equal success-message (nth 1 actual)) ; first run success
     (assert-equal success-message (nth 5 actual)) ; second run also sucess
-    (assert-equal failure-message (nth 9 actual))))) ; third run is failure
+    (assert-equal invalid-message (nth 9 actual))))) ; third run is failure
+
+;; Delimter for next test set
+(princ (format nil "~%->Tests for create-problem~%~%"))
 
 (run-test (lambda ()
-  "Should generate a variable size maze of all O's."
-  (let ((expected '((O O O)
-                    (O O O)
-                    (O O O))))
-    (assert-equal expected (create-problem 3))
-    (setf expected '((O O O O O)
-                     (O O O O O)
-                     (O O O O O)
-                     (O O O O O)
-                     (O O O O O)))
-    (assert-equal expected (create-problem 5)))))
+  "Should check run time for a very large search space."
+  ;; This "test" will always pass, but it can give an idication of run time.
+  ;; An earlier 7x7 maze has 55 moves because of walls.  Worst case everything is checked,
+  ;; so even a 5x5 "empty" maze has >300,000, so size matters for random generation.
+  (let* ((size 5)
+         (large-maze (make-list size :initial-element (make-list size :initial-element 'O)))
+         (start (get-universal-time)))
+    
+    (format *error-output* "      Moves made: ~D in ~D seconds"
+      (results (list large-maze 0 0) :moves t) (- (get-universal-time) start))
+    t)))
 
 (terpri)

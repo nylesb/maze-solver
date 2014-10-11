@@ -26,7 +26,7 @@
     (dolist (start starting-positions)
       ;; Initialize data for run
       (setf maze (copy-tree startmaze) row (first start) col (second start)
-            moves 0 path '(START) message "Help! I am trapped.")
+            moves 0 path '(START) message "Invalid starting position.")
       (block top-level-navigate ; Block allows us to stop all recursion with a return-from
         (labels ((pos (i j &key modify)
                    "Safely access maze value at position i j in maze.
@@ -67,10 +67,32 @@
                    (navigate)
                    (setf row (+ row 1) path (cdr path) moves (+ moves 1)) ; Backtrack
                    (pos row col :modify 'O))) ; Paths from this start exhausted, unmark
+          (unless (or (equal (pos row col) 'O) (equal (pos row col) 'E))
+            (return-from top-level-navigate (results)))
           (navigate)
+          (setf message "Help! I am trapped.")
           (results))))))
 
-(defun create-problem (&optional size)
-  "Randomly generates a maze & set of starting coordinates, then runs solve-maze on them."
-  (let ((maze (make-list size :initial-element (make-list size :initial-element 'O))))
-    maze))
+(defun create-problem (&key (size (+ (random 7) 3)) (wall-density 0.5) (times 3))
+  "Randomly generates a maze & set of starting coordinates, then runs solve-maze on them.
+  Size will be random from 3 to 10, or can be specified by user on call.
+  Similarly, density of walls is default to 50%, or can be set by user on call.
+  Will never generate an invalid starting position."
+  (let* ((maze (copy-tree (make-list size :initial-element (make-list size :initial-element 'O))))
+         (walls (* (* size size) wall-density))
+         (choice nil))
+    ;; Randomly sprinkle empty maze with walls to appropriate number of walls
+    (do ((num-walls 1 (+ num-walls 1)))
+        ((> num-walls walls))
+        (setf choice (list (random size) (random size)))
+        (if (equal (nth (second choice) (nth (first choice) maze)) '+)
+            (setf num-walls (- num-walls 1))
+            (setf (nth (second choice) (nth (first choice) maze)) '+)))
+    (setf (nth (random size) (nth (random size) maze)) 'E) ; Place exit
+    (dotimes (count times) ; Run however many times is asked for
+      (setf choice (list (random size) (random size)))
+      ;; Make sure we didn't pick an invlaid start
+      (do ()
+          ((equal (nth (second choice) (nth (first choice) maze)) 'O))
+          (setf choice (list (random size) (random size))))
+      (solve-maze :maze-list (list maze (first choice) (second choice))))))
